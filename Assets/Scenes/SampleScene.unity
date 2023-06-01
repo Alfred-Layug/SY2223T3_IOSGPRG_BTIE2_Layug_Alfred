@@ -180,7 +180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingXPosition
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingYPosition
@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingXPosition
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingYPosition
@@ -310,7 +310,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingXPosition
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingYPosition
@@ -419,7 +419,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1044158363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -651,8 +651,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 5, y: 4, z: 1}
+  m_Center: {x: 0, y: 3, z: 0}
 --- !u!23 &1270863311
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -731,17 +731,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a5ee3f7a5585b4c964f6a6cef260c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1044158363}
-  sprites:
-  - {fileID: 21300000, guid: 18e9c60a37e474642ae1aa1c7381d412, type: 3}
-  - {fileID: 21300000, guid: 7131926d2f04a3d4ba6ffaedd8118989, type: 3}
-  - {fileID: 21300000, guid: 9bbfbf158bbee064c8875e4bfb485101, type: 3}
-  - {fileID: 21300000, guid: ed08ee950c02e1c448d8e92a620c25d7, type: 3}
-  - {fileID: 21300000, guid: 6c4c2c879a452f24fa949a200d89c875, type: 3}
-  - {fileID: 21300000, guid: c8769d9078ae2d143bc70ed51ea307be, type: 3}
-  - {fileID: 21300000, guid: 5bb884002eb970e40b4cd2646fbff78d, type: 3}
-  - {fileID: 21300000, guid: 7adfa0d14e4449444be9e85ea5727334, type: 3}
-  inRange: 0
 --- !u!54 &1270863315
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1079,7 +1068,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1840325904
 Transform:
   m_ObjectHideFlags: 0
@@ -1124,7 +1113,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1959052642
 Transform:
   m_ObjectHideFlags: 0
@@ -1282,6 +1271,10 @@ PrefabInstance:
     - target: {fileID: 2944236633923175159, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
+      propertyPath: inRange
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2944236633923175160, guid: e6f19a8649b7f8e4499dccc8cea342ec, type: 3}
       propertyPath: startingXPosition
