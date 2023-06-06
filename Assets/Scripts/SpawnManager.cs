@@ -1,16 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SpawnManager : Singleton<SpawnManager>
 {
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private Transform spawnedParent;
-    [SerializeField] private List<GameObject> enemies;
+    [SerializeField] public List<GameObject> enemies;
 
-    private void Start()
+    private float spawnEnemyTimer;
+    private float currentSpawnEnemyTimer;
+
+    public bool _playerIsAlive;
+    public bool _playerIsDashing;
+
+    public void Start()
     {
-        SpawnEnemies(5);
+        _playerIsAlive = true;
+        _playerIsDashing = false;
+
+        SpawnEnemies(1);
+
+        spawnEnemyTimer = Random.Range(2.0f, 3.0f);
+        currentSpawnEnemyTimer = spawnEnemyTimer;
+    }
+
+    private void Update()
+    {
+        if (_playerIsAlive == true && _playerIsDashing == false)
+        {
+            if (currentSpawnEnemyTimer > 0)
+            {
+                currentSpawnEnemyTimer -= Time.deltaTime;
+            }
+            else
+            {
+                SpawnEnemies(1);
+                spawnEnemyTimer = Random.Range(2.0f, 3.0f);
+                currentSpawnEnemyTimer = spawnEnemyTimer;
+            }
+        }
+        else    //Reset spawn timer until dash is gone
+        {
+            currentSpawnEnemyTimer = spawnEnemyTimer;
+        }
     }
 
     public void RemoveEnemyFromList(GameObject enemy)
@@ -18,26 +52,47 @@ public class SpawnManager : Singleton<SpawnManager>
         enemies.Remove(enemy);
     }
 
-    private void SpawnEnemies (int count)
+    public void SpawnEnemies (int count)
     {
+        Debug.Log("Spawned!");
         for (int i = 0; i < count; i++)
         {
-            float randomXPosition = Random.Range(-10, 10);
-            float randomYPosition = Random.Range(-10, 10);
-            float randomZPosition = Random.Range(-10, 10);
+            if (_playerIsDashing == false)
+            {
+                float randomXPosition = Random.Range(-1.0f, 0.5f);
+                float randomYPosition = Random.Range(15, 20);
 
-            Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, randomZPosition);
+                Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
 
-            GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+                GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
 
-            enemy.transform.parent = spawnedParent;
+                enemy.transform.parent = spawnedParent;
 
-            enemies.Add(enemy);
+                enemies.Add(enemy);
 
-            Enemy enemyScript = enemy.GetComponent<Enemy>();
-            enemyScript._attack = 10;
-            enemyScript._defense = 10;
-            enemyScript._health = Random.Range(5, 10);
+                Enemy enemyScript = enemy.GetComponent<Enemy>();
+                enemyScript._attack = 10;
+                enemyScript._defense = 10;
+                enemyScript._health = Random.Range(5, 10);
+            }
+            else
+            {
+                float randomXPosition = Random.Range(-1.0f, 0.5f);
+                float randomYPosition = Random.Range(10, 13);     //Spawn closer to player to give the illusion of moving faster
+
+                Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
+
+                GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+
+                enemy.transform.parent = spawnedParent;
+
+                enemies.Add(enemy);
+
+                Enemy enemyScript = enemy.GetComponent<Enemy>();
+                enemyScript._attack = 10;
+                enemyScript._defense = 10;
+                enemyScript._health = Random.Range(5, 10);
+            }
         }
     }
 }

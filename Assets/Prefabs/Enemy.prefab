@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1.46, y: 0}
+  m_AnchoredPosition: {x: -1.5, y: 0}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &8640446682799777481
@@ -215,11 +215,12 @@ MonoBehaviour:
   _health: 0
   _attack: 0
   _defense: 0
-  startingXPosition: 2
-  startingYPosition: 15
   image: {fileID: 537205092266298609}
   arrowSprite: {fileID: 21300000, guid: d2756815dd639894095b4bdf47aeec2f, type: 3}
   inRange: 1
+  damagePlayer: 0
+  arrowDirection: 0
+  arrowColor: 0
 --- !u!1 &7208519238355431949
 GameObject:
   m_ObjectHideFlags: 0

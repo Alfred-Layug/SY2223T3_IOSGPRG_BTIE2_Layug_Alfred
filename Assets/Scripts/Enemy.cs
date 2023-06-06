@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,16 +10,12 @@ public class Enemy : MonoBehaviour
     public int _attack;
     public int _defense;
 
-    [SerializeField] private float startingXPosition;
-    [SerializeField] private float startingYPosition;
-
     [SerializeField] private Image image;
     [SerializeField] private Sprite arrowSprite;
 
-    [SerializeField] private bool inRange;
+    [SerializeField] public bool inRange;
 
-    private Vector2 initialTouchPosition;
-    private Vector2 endTouchPosition;
+    public bool damagePlayer;
 
     float timer;
     float movementSpeed;
@@ -28,8 +25,8 @@ public class Enemy : MonoBehaviour
     public enum Direction { Left, Down, Right, Up }
     public enum Color { Green, Red }
 
-    Direction arrowDirection;
-    Color arrowColor;
+    public Direction arrowDirection;
+    public Color arrowColor;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -39,19 +36,19 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        inRange = false;    // Enemy can no longer be killed if it gets too close to the player
+        damagePlayer = true;
     }
 
     void Start()
     {
         movementSpeed = 4.0f;
 
-        transform.position = new Vector2 (startingXPosition, startingYPosition);
-
         inRange = false;
         arrowDirection = (Direction)Random.Range(0, 4);
         arrowColor = (Color)Random.Range(0, 2);
         StartCoroutine(CO_Timer());
+
+        damagePlayer = false;
 
         originalRotation = image.transform.rotation;
 
@@ -61,25 +58,18 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        startingYPosition = startingYPosition - (Time.deltaTime * movementSpeed);
-
-        transform.Translate(Vector3.down * Time.deltaTime * movementSpeed, Space.World);
-
-        if (inRange == true)
+        if (SpawnManager.Instance._playerIsDashing)     //Enemies move faster if player is dashing to make it look like the player really is moving faster
         {
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                Touch touch = Input.GetTouch(0);
-                initialTouchPosition = touch.position;
-            }
+            transform.Translate(Vector3.down * Time.deltaTime * movementSpeed * 2.0f, Space.World);
+        }
+        else
+        {
+            transform.Translate(Vector3.down * Time.deltaTime * movementSpeed, Space.World);
+        }
 
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
-            {
-                Touch touch = Input.GetTouch(0);
-                endTouchPosition = touch.position;
-
-                CheckSwipe();
-            }
+        if (SpawnManager.Instance._playerIsAlive == false)  //Destroys all enemies and clears the enemies list in SpawnManager if player is killed
+        {
+            DoDeath();
         }
     }
 
@@ -140,53 +130,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void CheckSwipe()
+    public void DoDeath()
     {
-        Debug.Log("X " + Mathf.Abs(endTouchPosition.x - initialTouchPosition.x));
-        Debug.Log("Y " + Mathf.Abs(endTouchPosition.y - initialTouchPosition.y));
-
-        if (Mathf.Abs(endTouchPosition.y - initialTouchPosition.y) >
-            Mathf.Abs(endTouchPosition.x - initialTouchPosition.x) &&
-            Mathf.Abs(endTouchPosition.y - initialTouchPosition.y) >= 480)
-        {
-            if (initialTouchPosition.y < endTouchPosition.y && arrowDirection == Direction.Up)
-            {
-                Debug.Log("Swiped Up");
-                Destroy(gameObject);
-            }
-            else if (initialTouchPosition.y > endTouchPosition.y && arrowDirection == Direction.Down)
-            {
-                Debug.Log("Swiped Down");
-                Destroy(gameObject);
-            }
-            else
-            {
-                inRange = false;    //Player can no longer swipe after swiping in the wrong direction
-                Debug.Log("Wrong swipe, you got damaged.");
-            }
-        }
-        else if (Mathf.Abs(endTouchPosition.x - initialTouchPosition.x) >= 480)
-        {
-            if (initialTouchPosition.x < endTouchPosition.x && arrowDirection == Direction.Right)
-            {
-                Debug.Log("Swiped Right");
-                Destroy(gameObject);
-
-            }
-            else if (initialTouchPosition.x > endTouchPosition.x && arrowDirection == Direction.Left)
-            {
-                Debug.Log("Swiped Left");
-                Destroy(gameObject);
-            }
-            else
-            {
-                inRange = false;    //Player can no longer swipe after swiping in the wrong direction
-                Debug.Log("Wrong swipe, you got damaged.");
-            }
-        }
-        else
-        {
-            Debug.Log("Swipe not counted");
-        }
+        SpawnManager.Instance.RemoveEnemyFromList(gameObject);
+        Destroy(gameObject);
     }
 }
