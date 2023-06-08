@@ -13,12 +13,10 @@ public class SpawnManager : Singleton<SpawnManager>
     private float currentSpawnEnemyTimer;
 
     public bool _playerIsAlive;
-    public bool _playerIsDashing;
 
     public void Start()
     {
         _playerIsAlive = true;
-        _playerIsDashing = false;
 
         SpawnEnemies(1);
 
@@ -28,7 +26,7 @@ public class SpawnManager : Singleton<SpawnManager>
 
     private void Update()
     {
-        if (_playerIsAlive == true && _playerIsDashing == false)
+        if (_playerIsAlive == true)
         {
             if (currentSpawnEnemyTimer > 0)
             {
@@ -40,10 +38,6 @@ public class SpawnManager : Singleton<SpawnManager>
                 spawnEnemyTimer = Random.Range(2.0f, 3.0f);
                 currentSpawnEnemyTimer = spawnEnemyTimer;
             }
-        }
-        else    //Reset spawn timer until dash is gone
-        {
-            currentSpawnEnemyTimer = spawnEnemyTimer;
         }
     }
 
@@ -57,42 +51,21 @@ public class SpawnManager : Singleton<SpawnManager>
         Debug.Log("Spawned!");
         for (int i = 0; i < count; i++)
         {
-            if (_playerIsDashing == false)
-            {
-                float randomXPosition = Random.Range(-1.0f, 0.5f);
-                float randomYPosition = Random.Range(15, 20);
+            float randomXPosition = Random.Range(-1.0f, 0.5f);
+            float randomYPosition = Random.Range(15, 20);
 
-                Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
+            Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
 
-                GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+            GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
 
-                enemy.transform.parent = spawnedParent;
+            enemy.transform.parent = spawnedParent;
 
-                enemies.Add(enemy);
+            enemies.Add(enemy);
 
-                Enemy enemyScript = enemy.GetComponent<Enemy>();
-                enemyScript._attack = 10;
-                enemyScript._defense = 10;
-                enemyScript._health = Random.Range(5, 10);
-            }
-            else
-            {
-                float randomXPosition = Random.Range(-1.0f, 0.5f);
-                float randomYPosition = Random.Range(10, 13);     //Spawn closer to player to give the illusion of moving faster
-
-                Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
-
-                GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
-
-                enemy.transform.parent = spawnedParent;
-
-                enemies.Add(enemy);
-
-                Enemy enemyScript = enemy.GetComponent<Enemy>();
-                enemyScript._attack = 10;
-                enemyScript._defense = 10;
-                enemyScript._health = Random.Range(5, 10);
-            }
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+            enemyScript._attack = 10;
+            enemyScript._defense = 10;
+            enemyScript._health = Random.Range(5, 10);
         }
     }
 }

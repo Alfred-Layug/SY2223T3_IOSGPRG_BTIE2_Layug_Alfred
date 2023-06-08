@@ -46,7 +46,33 @@ public class Enemy : MonoBehaviour
         inRange = false;
         arrowDirection = (Direction)Random.Range(0, 4);
         arrowColor = (Color)Random.Range(0, 2);
-        StartCoroutine(CO_Timer());
+
+        if (arrowColor == Color.Green)
+        {
+            StartCoroutine(CO_Timer());
+        }
+        else
+        {
+            image.sprite = arrowSprite;
+            image.GetComponent<Image>().color = new Color32(255, 0, 0, 50);     //Red arrow will be less opaque if not yet in range
+            
+            if (arrowDirection == Direction.Down)
+            {
+                image.transform.Rotate(0, 0, -90);
+            }
+            else if (arrowDirection == Direction.Left)
+            {
+                image.transform.Rotate(0, 0, 180);
+            }
+            else if (arrowDirection == Direction.Up)
+            {
+                image.transform.Rotate(0, 0, 90);
+            }
+            else
+            {
+                image.transform.Rotate(0, 0, 0);
+            }
+        }
 
         damagePlayer = false;
 
@@ -58,13 +84,11 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        if (SpawnManager.Instance._playerIsDashing)     //Enemies move faster if player is dashing to make it look like the player really is moving faster
+        transform.Translate(Vector3.down * Time.deltaTime * movementSpeed, Space.World);
+
+        if (inRange == true && arrowColor == Color.Red)
         {
-            transform.Translate(Vector3.down * Time.deltaTime * movementSpeed * 2.0f, Space.World);
-        }
-        else
-        {
-            transform.Translate(Vector3.down * Time.deltaTime * movementSpeed, Space.World);
+            image.GetComponent<Image>().color = new Color32(255, 0, 0, 100);
         }
 
         if (SpawnManager.Instance._playerIsAlive == false)  //Destroys all enemies and clears the enemies list in SpawnManager if player is killed
@@ -86,47 +110,23 @@ public class Enemy : MonoBehaviour
         image.transform.rotation = originalRotation;
         image.sprite = arrowSprite;
 
-        if (arrowColor == Color.Green)
-        {
-            image.GetComponent<Image>().color = new Color32(0, 255, 0, 100);
+        image.GetComponent<Image>().color = new Color32(0, 255, 0, 100);
 
-            if (arrowDirection == Direction.Down)
-            {
-                image.transform.Rotate(0, 0, 90);
-            }
-            else if (arrowDirection == Direction.Right)
-            {
-                image.transform.Rotate(0, 0, 180);
-            }
-            else if (arrowDirection == Direction.Up)
-            {
-                image.transform.Rotate(0, 0, -90);
-            }
-            else
-            {
-                image.transform.Rotate(0, 0, 0);
-            }
+        if (arrowDirection == Direction.Down)
+        {
+            image.transform.Rotate(0, 0, 90);
         }
-        else    // Rotations are opposite here since red arrows tell the player to swipe in the opposite direction
+        else if (arrowDirection == Direction.Right)
         {
-            image.GetComponent<Image>().color = new Color32(255, 0, 0, 100);
-
-            if (arrowDirection == Direction.Down)
-            {
-                image.transform.Rotate(0, 0, -90);
-            }
-            else if (arrowDirection == Direction.Left)
-            {
-                image.transform.Rotate(0, 0, 180);
-            }
-            else if (arrowDirection == Direction.Up)
-            {
-                image.transform.Rotate(0, 0, 90);
-            }
-            else
-            {
-                image.transform.Rotate(0, 0, 0);
-            }
+            image.transform.Rotate(0, 0, 180);
+        }
+        else if (arrowDirection == Direction.Up)
+        {
+            image.transform.Rotate(0, 0, -90);
+        }
+        else
+        {
+            image.transform.Rotate(0, 0, 0);
         }
     }
 

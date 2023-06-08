@@ -9,11 +9,10 @@ public class Player : MonoBehaviour
 {
     public Image dashGauge;
     public Image dashButton;
+    public Image dashTapButton;
     public float dashMeterFill;
 
-    public Image firstHeart;
-    public Image secondHeart;
-    public Image thirdHeart;
+    public List<Image> heartSprites;
 
     public Image gameOver;
     public TextMeshProUGUI gameOverText;
@@ -31,6 +30,8 @@ public class Player : MonoBehaviour
     private float currentDashTimer;
     private bool isDashing;
 
+    private int score;
+
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log(other.name);
@@ -47,16 +48,19 @@ public class Player : MonoBehaviour
         _playerHealthMax = 3;
         isAlive = true;
         SpawnManager.Instance._playerIsAlive = true;
-        SpawnManager.Instance._playerIsDashing = false;
+
+        score = 0;
+
+        UpdateUIHealth();
 
         transform.position = new Vector2(0.0f, 0.0f);
 
         dashGauge.fillAmount = 0.0f;
+        dashMeterFill = 0.05f;
 
-        firstHeart.enabled = true; secondHeart.enabled = false; thirdHeart.enabled = false;
         dashButton.enabled = false;
 
-        dashTimer = 5.0f;
+        dashTimer = 15.0f;
         currentDashTimer = dashTimer;
         isDashing = false;
 
@@ -72,7 +76,6 @@ public class Player : MonoBehaviour
 
         if (_playerHealth <= 0)
         {
-            firstHeart.enabled = false; secondHeart.enabled = false; thirdHeart.enabled = false;
 
             SpawnManager.Instance._playerIsAlive = false;   //Enemies will stop spawning if player is dead
 
@@ -84,19 +87,6 @@ public class Player : MonoBehaviour
             DoDeath();
 
             Debug.Log("Game Over");
-        }
-
-        if (_playerHealth == 1)
-        {
-            firstHeart.enabled = true; secondHeart.enabled = false; thirdHeart.enabled = false;
-        }
-        else if (_playerHealth == 2)
-        {
-            secondHeart.enabled = true; thirdHeart.enabled = false;
-        }
-        else if ( _playerHealth == 3)
-        {
-            secondHeart.enabled = true; thirdHeart.enabled = true;
         }
 
         if (_playerHealth > 0 && SpawnManager.Instance.enemies.Count > 0)
@@ -149,7 +139,7 @@ public class Player : MonoBehaviour
         {
             isDashing = false;
             currentDashTimer = dashTimer;
-            SpawnManager.Instance._playerIsDashing = false;
+            Time.timeScale = 1;
         }
     }
 
@@ -216,11 +206,14 @@ public class Player : MonoBehaviour
     public void GrantExtraHealth()
     {
         int powerUpValue = Random.Range(0, 100);
+        Debug.Log(powerUpValue);
         if (powerUpValue < 3 && _playerHealth < _playerHealthMax)  //Health cannot go beyond the maximum health
         {
             _playerHealth++;
             Debug.Log("Extra Health Earned");
         }
+
+        UpdateUIHealth();
     }
 
     public void TakeDamage()
@@ -230,13 +223,14 @@ public class Player : MonoBehaviour
             _playerHealth--;
             Debug.Log(_playerHealth);
         }
+
+        UpdateUIHealth();
     }
 
     public void FillDashMeter()
     {
         if (dashGauge.fillAmount < 1.0f)
         {
-            dashMeterFill = Random.Range(0.01f, 0.05f);
             dashGauge.fillAmount += dashMeterFill;
         }
     }
@@ -254,7 +248,7 @@ public class Player : MonoBehaviour
             isDashing = true;
             dashButton.enabled = false;
             dashGauge.fillAmount = 0.0f;
-            SpawnManager.Instance._playerIsDashing = true;
+            Time.timeScale = 3;
         }
     }
 
@@ -266,5 +260,40 @@ public class Player : MonoBehaviour
     public void RetryGame()
     {
         Start();
+    }
+
+    public void UpdateUIHealth()
+    {
+        for (int i = 0; i < _playerHealthMax; i++)
+        {
+            if (_playerHealth > i)
+            {
+                heartSprites[i].enabled = true;
+            }
+            else
+            {
+                heartSprites[i].enabled = false;
+            }
+        }
+    }
+
+    public void DoDashTap()
+    {
+        if (SpawnManager.Instance.enemies.Count > 0 && isAlive == true)
+        {
+            GameObject currentEnemy = SpawnManager.Instance.enemies[0];
+            Enemy enemyScript = currentEnemy.GetComponent<Enemy>();
+
+            if (enemyScript.inRange == false)
+            {
+                score++;
+            }
+        }
+        else if (SpawnManager.Instance.enemies.Count == 0 && isAlive == true)
+        {
+            score++;
+        }
+
+        Debug.Log("Score: " + score);
     }
 }
