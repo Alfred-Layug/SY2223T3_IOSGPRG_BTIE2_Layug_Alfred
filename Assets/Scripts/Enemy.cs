@@ -20,6 +20,8 @@ public class Enemy : MonoBehaviour
     float timer;
     float movementSpeed;
 
+    private int rotating;
+
     Quaternion originalRotation;
 
     public enum Direction { Left, Down, Right, Up }
@@ -46,12 +48,15 @@ public class Enemy : MonoBehaviour
         inRange = false;
         arrowDirection = (Direction)Random.Range(0, 4);
         arrowColor = (Color)Random.Range(0, 2);
+        rotating = Random.Range(0, 2);  //0 = not rotating; 1 = rotating
 
-        if (arrowColor == Color.Green)
+        Debug.Log("Rotation: " + rotating);
+
+        if (arrowColor == Color.Green && rotating == 1)
         {
             StartCoroutine(CO_Timer());
         }
-        else
+        else if (arrowColor == Color.Red)
         {
             image.sprite = arrowSprite;
             image.GetComponent<Image>().color = new Color32(255, 0, 0, 50);     //Red arrow will be less opaque if not yet in range
@@ -67,6 +72,28 @@ public class Enemy : MonoBehaviour
             else if (arrowDirection == Direction.Up)
             {
                 image.transform.Rotate(0, 0, 90);
+            }
+            else
+            {
+                image.transform.Rotate(0, 0, 0);
+            }
+        }
+        else if (arrowColor == Color.Green && rotating == 0)
+        {
+            image.sprite = arrowSprite;
+            image.GetComponent<Image>().color = new Color32(0, 255, 0, 50);     //Red arrow will be less opaque if not yet in range
+
+            if (arrowDirection == Direction.Down)
+            {
+                image.transform.Rotate(0, 0, 90);
+            }
+            else if (arrowDirection == Direction.Right)
+            {
+                image.transform.Rotate(0, 0, 180);
+            }
+            else if (arrowDirection == Direction.Up)
+            {
+                image.transform.Rotate(0, 0, -90);
             }
             else
             {
@@ -89,6 +116,10 @@ public class Enemy : MonoBehaviour
         if (inRange == true && arrowColor == Color.Red)
         {
             image.GetComponent<Image>().color = new Color32(255, 0, 0, 100);
+        }
+        else if (inRange == true && arrowColor == Color.Green && rotating == 0)
+        {
+            image.GetComponent<Image>().color = new Color32(0, 255, 0, 100);
         }
 
         if (SpawnManager.Instance._playerIsAlive == false)  //Destroys all enemies and clears the enemies list in SpawnManager if player is killed

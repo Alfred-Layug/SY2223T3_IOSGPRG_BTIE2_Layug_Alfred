@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -18,6 +17,8 @@ public class Player : MonoBehaviour
     public TextMeshProUGUI gameOverText;
     public Image retryButton;
     public TextMeshProUGUI retryText;
+    public TextMeshProUGUI scoreText;
+    public Image dashTapIcon;
 
     public int _playerHealth;
     public int _playerHealthMax;
@@ -29,6 +30,10 @@ public class Player : MonoBehaviour
     private float dashTimer;
     private float currentDashTimer;
     private bool isDashing;
+
+    private float dashTapTimer;
+    private float currentDashTapTimer;
+    private bool dashTapActive;
 
     private int score;
 
@@ -44,7 +49,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {        
-        _playerHealth = 1;
+        _playerHealth = 3;
         _playerHealthMax = 3;
         isAlive = true;
         SpawnManager.Instance._playerIsAlive = true;
@@ -64,10 +69,19 @@ public class Player : MonoBehaviour
         currentDashTimer = dashTimer;
         isDashing = false;
 
+        dashTapTimer = 1.0f;
+        currentDashTapTimer = dashTapTimer;
+        dashTapActive = false;
+
+        Time.timeScale = 1.0f;
+
         gameOver.enabled = false;
         gameOverText.enabled = false;
         retryButton.enabled = false;
         retryText.enabled = false;
+        dashTapIcon.enabled = false;
+
+        scoreText.text = "Score: " + score;
     }
 
     private void Update()
@@ -116,7 +130,12 @@ public class Player : MonoBehaviour
                 {
                     SpawnManager.Instance.SpawnEnemies(1);
                 }
+                
                 enemyScript.DoDeath();
+
+                score += 2;
+
+                scoreText.text = "Score: " + score;
             }
 
             if (enemyScript.damagePlayer == true)    //Player gets damaged if they take too long to swipe or not swipe at all
@@ -131,15 +150,27 @@ public class Player : MonoBehaviour
             dashButton.enabled = true;
         }
 
-        if (isDashing == true && currentDashTimer > 0.0f)
+        if (isDashing == true && currentDashTimer > 0)
         {
             currentDashTimer -= Time.deltaTime;
         }
-        else
+        else if (isDashing == true && currentDashTimer <= 0)
         {
             isDashing = false;
             currentDashTimer = dashTimer;
-            Time.timeScale = 1;
+            Time.timeScale = 1.0f;
+        }
+
+        if (dashTapActive == true && currentDashTapTimer > 0)
+        {
+            currentDashTapTimer -= Time.deltaTime;
+        }
+        else if (dashTapActive == true && currentDashTapTimer <= 0)
+        {
+            currentDashTapTimer = dashTapTimer;
+            dashTapActive = false;
+            dashTapIcon.enabled = false;
+            Time.timeScale = 1.0f;
         }
     }
 
@@ -201,13 +232,18 @@ public class Player : MonoBehaviour
                 Debug.Log("Swipe not counted");
             }
         }
+
+        currentDashTapTimer = dashTapTimer;
+        dashTapActive = false;
+        dashTapIcon.enabled = false;
+        Time.timeScale = 1.0f;
     }
 
     public void GrantExtraHealth()
     {
         int powerUpValue = Random.Range(0, 100);
         Debug.Log(powerUpValue);
-        if (powerUpValue < 3 && _playerHealth < _playerHealthMax)  //Health cannot go beyond the maximum health
+        if (powerUpValue <= 3 && _playerHealth < _playerHealthMax)  //Health cannot go beyond the maximum health
         {
             _playerHealth++;
             Debug.Log("Extra Health Earned");
@@ -239,16 +275,18 @@ public class Player : MonoBehaviour
     {
         GrantExtraHealth();
         FillDashMeter();
+        score += 2;
+        scoreText.text = "Score: " + score;
     }
 
     public void ActivateDash()
     {
-        if (dashButton.enabled == true)
+        if (dashButton.enabled == true && dashTapActive == false && isAlive == true)
         {
             isDashing = true;
             dashButton.enabled = false;
             dashGauge.fillAmount = 0.0f;
-            Time.timeScale = 3;
+            Time.timeScale = 3.0f;
         }
     }
 
@@ -279,21 +317,29 @@ public class Player : MonoBehaviour
 
     public void DoDashTap()
     {
-        if (SpawnManager.Instance.enemies.Count > 0 && isAlive == true)
+        if (isDashing == false && dashTapActive == false && isAlive == true)     //Player must not be able to dash tap if currently dashing
         {
-            GameObject currentEnemy = SpawnManager.Instance.enemies[0];
-            Enemy enemyScript = currentEnemy.GetComponent<Enemy>();
+            if (SpawnManager.Instance.enemies.Count > 0 && isAlive == true)
+            {
+                GameObject currentEnemy = SpawnManager.Instance.enemies[0];
+                Enemy enemyScript = currentEnemy.GetComponent<Enemy>();
 
-            if (enemyScript.inRange == false)
+                if (enemyScript.inRange == false)
+                {
+                    score++;
+                }
+            }
+            else if (SpawnManager.Instance.enemies.Count == 0 && isAlive == true)
             {
                 score++;
             }
-        }
-        else if (SpawnManager.Instance.enemies.Count == 0 && isAlive == true)
-        {
-            score++;
-        }
 
-        Debug.Log("Score: " + score);
+            Time.timeScale = 2.0f;
+            dashTapActive = true;
+            dashTapIcon.enabled = true;
+            scoreText.text = "Score: " + score;
+
+            Debug.Log("Score: " + score);
+        }
     }
 }
