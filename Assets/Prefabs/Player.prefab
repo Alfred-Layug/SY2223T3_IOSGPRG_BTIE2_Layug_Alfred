@@ -149,7 +149,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c36b32186a3dab1479bc53fb87a3b474, type: 2}
+  - {fileID: 2100000, guid: 4142c738356a91d41808acfa43064646, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -212,4 +212,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a5ee3f7a5585b4c964f6a6cef260c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dashGauge: {fileID: 0}
+  dashButton: {fileID: 0}
+  dashTapButton: {fileID: 0}
+  dashMeterFill: 0
+  heartSprites: []
+  gameOver: {fileID: 0}
+  gameOverText: {fileID: 0}
+  retryButton: {fileID: 0}
+  retryText: {fileID: 0}
+  scoreText: {fileID: 0}
+  dashTapIcon: {fileID: 0}
   _playerHealth: 0
+  _playerHealthMax: 0

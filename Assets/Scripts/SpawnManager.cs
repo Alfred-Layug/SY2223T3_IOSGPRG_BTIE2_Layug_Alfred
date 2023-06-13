@@ -35,8 +35,6 @@ public class SpawnManager : Singleton<SpawnManager>
             else
             {
                 SpawnEnemies(1);
-                spawnEnemyTimer = Random.Range(2.0f, 3.0f);
-                currentSpawnEnemyTimer = spawnEnemyTimer;
             }
         }
     }
@@ -51,7 +49,7 @@ public class SpawnManager : Singleton<SpawnManager>
         Debug.Log("Spawned!");
         for (int i = 0; i < count; i++)
         {
-            float randomXPosition = Random.Range(-1.0f, 0.5f);
+            float randomXPosition = Random.Range(-1.0f, 0.0f);
             float randomYPosition = Random.Range(15, 20);
 
             Vector3 randomPosition = new Vector3(randomXPosition, randomYPosition, 0);
@@ -67,5 +65,8 @@ public class SpawnManager : Singleton<SpawnManager>
             enemyScript._defense = 10;
             enemyScript._health = Random.Range(5, 10);
         }
+
+        spawnEnemyTimer = Random.Range(2.0f, 3.0f);
+        currentSpawnEnemyTimer = spawnEnemyTimer;
     }
 }
