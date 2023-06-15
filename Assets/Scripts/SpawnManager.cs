@@ -11,7 +11,6 @@ public class SpawnManager : Singleton<SpawnManager>
 
     private float spawnEnemyTimer;
     private float currentSpawnEnemyTimer;
-
     public bool _playerIsAlive;
 
     public void Start()
@@ -59,11 +58,6 @@ public class SpawnManager : Singleton<SpawnManager>
             enemy.transform.parent = spawnedParent;
 
             enemies.Add(enemy);
-
-            Enemy enemyScript = enemy.GetComponent<Enemy>();
-            enemyScript._attack = 10;
-            enemyScript._defense = 10;
-            enemyScript._health = Random.Range(5, 10);
         }
 
         spawnEnemyTimer = Random.Range(2.0f, 3.0f);

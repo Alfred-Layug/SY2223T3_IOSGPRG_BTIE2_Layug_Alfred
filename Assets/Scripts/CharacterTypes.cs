@@ -6,18 +6,8 @@ public class CharacterTypes : Singleton<CharacterTypes>
 {
     public int characterType;
 
-    public void ChooseDefaultCharacter()
+    public void ChooseCharacter(int characterNumber)
     {
-        characterType = 0;
-    }
-
-    public void ChooseTankCharacter()
-    {
-        characterType = 1;
-    }
-
-    public void ChooseSpeedCharacter()
-    {
-        characterType = 2;
+        characterType = characterNumber;
     }
 }

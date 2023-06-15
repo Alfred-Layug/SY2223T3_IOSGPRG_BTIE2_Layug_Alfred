@@ -6,29 +6,18 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-    public int _health;
-    public int _attack;
-    public int _defense;
-
     [SerializeField] private Image image;
     [SerializeField] private Sprite arrowSprite;
 
-    [SerializeField] public bool inRange;
-
+    public bool inRange;
     public bool damagePlayer;
-
-    float timer;
-    float movementSpeed;
-
+    private float movementSpeed;
     private int rotating;
-
-    Quaternion originalRotation;
-
+    private Quaternion originalRotation;
     public enum Direction { Left, Down, Right, Up }
-    public enum Color { Green, Red }
-
+    public enum ArrowColor { Green, Red }
     public Direction arrowDirection;
-    public Color arrowColor;
+    public ArrowColor arrowColor;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -47,16 +36,16 @@ public class Enemy : MonoBehaviour
 
         inRange = false;
         arrowDirection = (Direction)Random.Range(0, 4);
-        arrowColor = (Color)Random.Range(0, 2);
+        arrowColor = (ArrowColor)Random.Range(0, 2);
         rotating = Random.Range(0, 2);  //0 = not rotating; 1 = rotating
 
         Debug.Log("Rotation: " + rotating);
 
-        if (arrowColor == Color.Green && rotating == 1)
+        if (arrowColor == ArrowColor.Green && rotating == 1)
         {
             StartCoroutine(CO_Timer());
         }
-        else if (arrowColor == Color.Red)
+        else if (arrowColor == ArrowColor.Red)
         {
             image.sprite = arrowSprite;
             image.GetComponent<Image>().color = new Color32(255, 0, 0, 50);     //Red arrow will be less opaque if not yet in range
@@ -78,7 +67,7 @@ public class Enemy : MonoBehaviour
                 image.transform.Rotate(0, 0, 0);
             }
         }
-        else if (arrowColor == Color.Green && rotating == 0)
+        else if (arrowColor == ArrowColor.Green && rotating == 0)
         {
             image.sprite = arrowSprite;
             image.GetComponent<Image>().color = new Color32(0, 255, 0, 50);     //Red arrow will be less opaque if not yet in range
@@ -113,13 +102,13 @@ public class Enemy : MonoBehaviour
     {
         transform.Translate(Vector3.down * Time.deltaTime * movementSpeed, Space.World);
 
-        if (inRange == true && arrowColor == Color.Red)
+        if (inRange == true && arrowColor == ArrowColor.Red)
         {
-            image.GetComponent<Image>().color = new Color32(255, 0, 0, 100);
+            image.GetComponent<Image>().color = Color.red;
         }
-        else if (inRange == true && arrowColor == Color.Green && rotating == 0)
+        else if (inRange == true && arrowColor == ArrowColor.Green && rotating == 0)
         {
-            image.GetComponent<Image>().color = new Color32(0, 255, 0, 100);
+            image.GetComponent<Image>().color = Color.green;
         }
 
         if (SpawnManager.Instance._playerIsAlive == false)  //Destroys all enemies and clears the enemies list in SpawnManager if player is killed
@@ -134,14 +123,14 @@ public class Enemy : MonoBehaviour
         {
             yield return new WaitForSeconds(0.2f);
             image.sprite = arrowSprite;
-            image.GetComponent<Image>().color = new Color32(255, 255, 0, 100);  //Arrow will be color yellow while still rotating
+            image.GetComponent<Image>().color = Color.yellow;  //Arrow will be color yellow while still rotating
             image.transform.Rotate(0, 0, 90);
         }
 
         image.transform.rotation = originalRotation;
         image.sprite = arrowSprite;
 
-        image.GetComponent<Image>().color = new Color32(0, 255, 0, 100);
+        image.GetComponent<Image>().color = Color.green;
 
         if (arrowDirection == Direction.Down)
         {

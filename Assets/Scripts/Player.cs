@@ -9,66 +9,28 @@ public class Player : MonoBehaviour
 {
     public GameObject building;
     public GameObject soundManager;
-
-    public Image dashGauge;
-    public Image dashButton;
-    public Image dashTapButton;
-    public float dashMeterFill;
+    public GameObject uiManager;
 
     public List<Image> heartSprites;
 
-    public Image gameOver;
-    public TextMeshProUGUI gameOverText;
-    public Image retryButton;
-    public TextMeshProUGUI retryText;
-    public TextMeshProUGUI scoreText;
-    public Image dashTapIcon;
-    public Image changeCharacter;
-    public TextMeshProUGUI changeCharacterText;
-    public Image firstCharacterOption;
-    public Image secondCharacterOption;
-    public TextMeshProUGUI firstCharacterText;
-    public TextMeshProUGUI secondCharacterText;
-    public Image quitButton;
-    public TextMeshProUGUI quitText;
-    public Image tankCharacterIcon;
-    public Image speedCharacterIcon;
-
     public int _playerHealth;
     public int _playerHealthMax;
-    private bool isAlive;
+    public bool isAlive;
 
     private Vector2 initialTouchPosition;
     private Vector2 endTouchPosition;
 
     private float dashTimer;
     private float currentDashTimer;
-    private bool isDashing;
+    public bool isDashing;
 
     private float dashTapTimer;
     private float currentDashTapTimer;
-    private bool dashTapActive;
-    private int score;
+    public bool dashTapActive;
 
-    private void Start()
+    public void Start()
     {
         building.GetComponent<VideoPlayer>().Play();
-
-        if (CharacterTypes.Instance.characterType == 1)     //Tank character
-        {
-            tankCharacterIcon.enabled = true;
-            speedCharacterIcon.enabled = false;
-        }
-        else if (CharacterTypes.Instance.characterType == 2)    //Speed character
-        {
-            tankCharacterIcon.enabled = false;
-            speedCharacterIcon.enabled = true;
-        }
-        else    //Default character
-        {
-            tankCharacterIcon.enabled = false;
-            speedCharacterIcon.enabled = false;
-        }
 
         if (CharacterTypes.Instance.characterType == 1)
         {
@@ -82,23 +44,9 @@ public class Player : MonoBehaviour
         isAlive = true;
         SpawnManager.Instance._playerIsAlive = true;
 
-        score = 0;
-
         UpdateUIHealth();
 
         transform.position = new Vector2(0.0f, 0.0f);
-
-        dashGauge.fillAmount = 0.0f;
-        if (CharacterTypes.Instance.characterType == 2)
-        {
-            dashMeterFill = 0.1f;
-        }
-        else
-        {
-            dashMeterFill = 0.05f;
-        }
-
-        dashButton.enabled = false;
 
         dashTimer = 15.0f;
         currentDashTimer = dashTimer;
@@ -109,50 +57,11 @@ public class Player : MonoBehaviour
         dashTapActive = false;
 
         Time.timeScale = 1.0f;
-
-        gameOver.enabled = false;
-        gameOverText.enabled = false;
-        retryButton.enabled = false;
-        retryText.enabled = false;
-        dashTapIcon.enabled = false;
-        changeCharacter.enabled = false;
-        changeCharacterText.enabled = false;
-        firstCharacterOption.enabled = false;
-        secondCharacterOption.enabled = false;
-        firstCharacterText.enabled = false;
-        secondCharacterText.enabled = false;
-        quitButton.enabled = false;
-        quitText.enabled = false;
-
-        scoreText.text = "Score: " + score;
     }
 
     private void Update()
     {
         if (!isAlive) return;
-
-        if (_playerHealth <= 0)
-        {
-
-            SpawnManager.Instance._playerIsAlive = false;   //Enemies will stop spawning if player is dead
-
-            gameOver.enabled = true;
-            gameOverText.enabled = true;
-            retryButton.enabled = true;
-            retryText.enabled = true;
-            changeCharacter.enabled = true;
-            changeCharacterText.enabled = true;
-            firstCharacterOption.enabled = true;
-            secondCharacterOption.enabled = true;
-            firstCharacterText.enabled = true;
-            secondCharacterText.enabled = true;
-            quitButton.enabled = true;
-            quitText .enabled = true;
-
-            DoDeath();
-
-            Debug.Log("Game Over");
-        }
 
         if (_playerHealth > 0 && SpawnManager.Instance.enemies.Count > 0)
         {
@@ -177,6 +86,8 @@ public class Player : MonoBehaviour
             }
             else if (enemyScript.inRange == true && isDashing == true)  //Enemy automatically gets killed if player is dashing
             {
+                UIManager UIScript = uiManager.GetComponent<UIManager>();
+
                 if (SpawnManager.Instance.enemies.Count < 2)
                 {
                     SpawnManager.Instance.SpawnEnemies(1);
@@ -184,8 +95,7 @@ public class Player : MonoBehaviour
 
                 enemyScript.DoDeath();
                 soundManager.GetComponent<SoundManager>().PlayEnemyKilledSound();
-                score += 2;
-                scoreText.text = "Score: " + score;
+                UIScript.UpdateScore(2);
             }
 
             if (enemyScript.damagePlayer == true)    //Player gets damaged if they take too long to swipe or not swipe at all
@@ -193,11 +103,6 @@ public class Player : MonoBehaviour
                 TakeDamage();
                 enemyScript.DoDeath();
             }
-        }
-
-        if (dashGauge.fillAmount >= 1.0f)
-        {
-            dashButton.enabled = true;
         }
 
         if (isDashing == true && currentDashTimer > 0)
@@ -217,9 +122,11 @@ public class Player : MonoBehaviour
         }
         else if (dashTapActive == true && currentDashTapTimer <= 0)
         {
+            UIManager UIScript = uiManager.GetComponent<UIManager>();
+
             currentDashTapTimer = dashTapTimer;
             dashTapActive = false;
-            dashTapIcon.enabled = false;
+            UIScript.dashTapIcon.enabled = false;
             Time.timeScale = 1.0f;
         }
     }
@@ -282,11 +189,12 @@ public class Player : MonoBehaviour
                 Debug.Log("Swipe not counted");
             }
         }
+        UIManager UIScript = uiManager.GetComponent<UIManager>();
 
         soundManager.GetComponent<SoundManager>().StopDashTapSound();
         currentDashTapTimer = dashTapTimer;
         dashTapActive = false;
-        dashTapIcon.enabled = false;
+        UIScript.dashTapIcon.enabled = false;
         Time.timeScale = 1.0f;
     }
 
@@ -314,65 +222,20 @@ public class Player : MonoBehaviour
         UpdateUIHealth();
     }
 
-    public void FillDashMeter()
-    {
-        if (dashGauge.fillAmount < 1.0f)
-        {
-            dashGauge.fillAmount += dashMeterFill;
-        }
-    }
-
     public void GivePlayerRewards()
     {
+        UIManager UIScript = uiManager.GetComponent<UIManager>();
+
         GrantExtraHealth();
-        FillDashMeter();
+        UIScript.FillDashMeter();
+        UIScript.UpdateScore(2);
         soundManager.GetComponent<SoundManager>().PlayEnemyKilledSound();
-        score += 2;
-        scoreText.text = "Score: " + score;
-    }
-
-    public void ActivateDash()
-    {
-        if (dashButton.enabled == true && dashTapActive == false && isAlive == true)
-        {
-            isDashing = true;
-            dashButton.enabled = false;
-            dashGauge.fillAmount = 0.0f;
-            Time.timeScale = 3.0f;
-            soundManager.GetComponent<SoundManager>().PlayDashingSound();
-        }
-    }
-
-    public void DoDeath()
-    {
-        isAlive = false;
-
-        if (CharacterTypes.Instance.characterType == 0)
-        {
-            firstCharacterText.text = "Tank";
-            secondCharacterText.text = "Speed";
-        }
-        else if (CharacterTypes.Instance.characterType == 1)
-        {
-            firstCharacterText.text = "Default";
-            secondCharacterText.text = "Speed";
-        }
-        else if (CharacterTypes.Instance.characterType == 2)
-        {
-            firstCharacterText.text = "Default";
-            secondCharacterText.text = "Tank";
-        }
-
-        building.GetComponent<VideoPlayer>().Pause();
-    }
-
-    public void RetryGame()
-    {
-        Start();
     }
 
     public void UpdateUIHealth()
     {
+        UIManager UIScript = uiManager.GetComponent<UIManager>();
+
         for (int i = 0; i < 5; i++)
         {
             if (_playerHealth > i)
@@ -384,66 +247,11 @@ public class Player : MonoBehaviour
                 heartSprites[i].enabled = false;
             }
         }
-    }
 
-    public void DoDashTap()
-    {
-        if (isDashing == false && dashTapActive == false && isAlive == true)     //Player must not be able to dash tap if currently dashing
+        if (_playerHealth <= 0)
         {
-            if (SpawnManager.Instance.enemies.Count > 0 && isAlive == true)
-            {
-                GameObject currentEnemy = SpawnManager.Instance.enemies[0];
-                Enemy enemyScript = currentEnemy.GetComponent<Enemy>();
-
-                if (enemyScript.inRange == false)
-                {
-                    score++;
-                }
-            }
-            else if (SpawnManager.Instance.enemies.Count == 0 && isAlive == true)
-            {
-                score++;
-            }
-
-            soundManager.GetComponent<SoundManager>().PlayDashTapSound();
-            Time.timeScale = 2.0f;
-            dashTapActive = true;
-            dashTapIcon.enabled = true;
-            scoreText.text = "Score: " + score;
-            Debug.Log("Score: " + score);
+            UIScript.DoPlayerDeath();
+            UIScript.ShowGameOverUI();
         }
-    }
-
-    public void ChangeToFirstCharacter()
-    {
-        if (CharacterTypes.Instance.characterType == 0)
-        {
-            CharacterTypes.Instance.characterType = 1;
-        }
-        else
-        {
-            CharacterTypes.Instance.characterType = 0;
-        }
-
-        RetryGame();
-    }
-
-    public void ChangeToSecondCharacter()
-    {
-        if (CharacterTypes.Instance.characterType == 0 || CharacterTypes.Instance.characterType == 1)
-        {
-            CharacterTypes.Instance.characterType = 2;
-        }
-        else
-        {
-            CharacterTypes.Instance.characterType = 1;
-        }
-
-        RetryGame();
-    }
-
-    public void ExitGame()
-    {
-        Application.Quit();
     }
 }
